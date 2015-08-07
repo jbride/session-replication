@@ -1,4 +1,5 @@
 <%@page import="java.util.Date"%>
+<%@page import="java.io.File,java.io.BufferedReader,java.io.FileReader" %>
 
 <html>
 <head>
@@ -9,70 +10,74 @@
 </head>
 <body>
 
-	<%
-		// gear name
-		String gearId = System.getenv("OPENSHIFT_GEAR_UUID");
-	
-		// get counter
-		Integer counter = (Integer) session.getAttribute("demo.counter");
-		if (counter == null) {
-			counter = 0;
-			session.setAttribute("demo.counter", counter);
-		}
+    <%
+        // gear name
+        // String gearId = System.getenv("OPENSHIFT_GEAR_UUID");
+        File hostnameFile = new File("/etc/hostname");
+        BufferedReader br = new BufferedReader(new FileReader(hostnameFile));
+        String hostname = br.readLine();
 
-		// check for increment action
-		String action = request.getParameter("action");
+    
+        // get counter
+        Integer counter = (Integer) session.getAttribute("demo.counter");
+        if (counter == null) {
+            counter = 0;
+            session.setAttribute("demo.counter", counter);
+        }
 
-		if (action != null && action.equals("increment")) {
-			// increment number
-			counter = counter.intValue() + 1;
+        // check for increment action
+        String action = request.getParameter("action");
 
-			// update session
-			session.setAttribute("demo.counter", counter);
-			session.setAttribute("demo.timestamp", new Date());
-		}
-	%>
-	<h3>Testing OpenShift Session Replication</h3>
-	<hr>
+        if (action != null && action.equals("increment")) {
+            // increment number
+            counter = counter.intValue() + 1;
 
-	<br> <b>Session Data</b>
+            // update session
+            session.setAttribute("demo.counter", counter);
+            session.setAttribute("demo.timestamp", new Date());
+        }
+    %>
+    <h3>Testing OpenShift Session Replication</h3>
+    <hr>
 
-	<br>
-	<br>
+    <br> <b>Session Data</b>
 
-	Session ID: <%=session.getId()%>
+    <br>
+    <br>
 
-	<br>
-	<br>
+    Session ID: <%=session.getId()%>
 
-	<table>
-		<tr>
-			<th>Description</th>
-			<th>Attribute Name</th>
-			<th>Attribute Value</th>
-		</tr>
+    <br>
+    <br>
 
-		<tr>
-			<td>Session counter</td>
-			<td>demo.counter</td>
-			<td><%= session.getAttribute("demo.counter") %></td>
-		</tr>
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Attribute Name</th>
+            <th>Attribute Value</th>
+        </tr>
 
-		<tr>
-			<td>Timestamp of last increment</td>
-			<td>demo.timestamp</td>
-			<td><%= session.getAttribute("demo.timestamp") %></td>
-		</tr>
-	</table>
+        <tr>
+            <td>Session counter</td>
+            <td>demo.counter</td>
+            <td><%= session.getAttribute("demo.counter") %></td>
+        </tr>
 
-	<br>
-	<br> Page served by gear: <%= gearId %> at <%= new java.util.Date() %>
+        <tr>
+            <td>Timestamp of last increment</td>
+            <td>demo.timestamp</td>
+            <td><%= session.getAttribute("demo.timestamp") %></td>
+        </tr>
+    </table>
 
-	<br>
-	<br>
+    <br>
+    <br> Page served by container: <%= hostname %> at <%= new java.util.Date() %>
 
-	<a href="index.jsp?action=increment">Increment Counter</a> |
-	<a href="index.jsp">Refresh</a>
+    <br>
+    <br>
+
+    <a href="index.jsp?action=increment">Increment Counter</a> |
+    <a href="index.jsp">Refresh</a>
 
 </body>
 </html>
